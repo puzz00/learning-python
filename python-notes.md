@@ -1,6 +1,8 @@
 # Learning Python
 
-This notebook covers various aspects of learning the python programming language.
+Python is a great language to know when working in cyber security - it gives us the means to craft our own tools.
+
+Whilst these notes are not comprehensive - they are a start point and will be added to over time...
 
 ## Variables
 
