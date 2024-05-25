@@ -792,6 +792,155 @@ print(fn2(8, 2))
 6
 ```
 
+## Lambdas
+
+Lambdas are another way to create functions - they are *expression based functions*
+
+If we think about how we assign values to variables we can see that the right side of the `=` assignment operator is an *expression* such as in `x = 2 + 3` the `2 + 3` part is an *expression* which returns a value to be assigned to `x`
+
+This means that with a `lambda` we can use them as an *expression* to assign to a variable.
+
+```python=
+x = lambda a, b: a + b # the lambda is an expression based function
+print(x(2, 3))
+```
+
+```
+5
+```
+
+Another way to see *lambdas* is as *anonymous functions* because we do not give them names. A good way to help us understand this is to look at the syntax of a regular function and a lambda side-by-side.
+
+```python=
+def add(x, y): # regular function
+    return x + y
+add = lambda x, y: x + y # lambda function
+```
+
+We can see that the *lambda* does not have a name whereas using *def* we do use a name.
+
+The parameters for a *lambda* are not in parentheses whereas with *def* they are in parens.
+
+The `:` is in both the regular function and the lambda.
+
+There is no indentation needed for a *lambda* - we cannot use indentation with lambdas.
+
+We do not use the `return` keyword with a *lambda* because it will always *return* the last expression given.
+
+To sum up the syntax for a lambda we can see it as:
+
+`lambda <PARAMS>: <RETURN VALUE>`
+
+>[!NOTE]
+>Lambdas do not allow the use of *control flow* structures such as *if* or *for* statements
+
+### Use of lambdas
+
+We could think that *lambdas* are useless since they do not let us write complex functions with control flow structures - but we would be wrong in thinking this.
+
+Lambdas are important because they let us make our code more *concise* and more *expressive*
+
+A common useage of lambdas is when we only need to use a function once - a good example of this is passing a function as an argument to another function.
+
+We dont want to waste time and memory writing regular functions in such a situation - we can use a `lambda` instead.
+
+We can go back to our `add()` and `subtract()` and `compute()` functions which we defined in the section on *Functions as First Class Objects*
+
+```python=
+def add(a, b):
+    return a + b
+
+def subtract(a, b):
+    return a - b
+
+def compute(a, b, operation):
+    return operation(a, b)
+```
+
+It seems like a waste of time and memory to define the `add()` and `subtract()` simple functions in such a way - this is because it is a waste of time and memory - it is much better to use a `lambda`
+
+```python=
+compute(2, 8, lambda x, y: x + y)
+compute(8, 7, lambda x, y: x - y)
+```
+
+>[!NOTE]
+>We only assigned *lambdas* to variables earlier in these notes to better illustrate how they are *expression based functions* - in reality it is redundent to do this - we just create *lambdas* on-the-fly as shown in the example above
+
+The power of *lambdas* is in their brevity and expressiveness - they are especially useful when we are passing functions as arguments or returning them.
+
+#### Examples of Using `lambda`
+
+Here we go over examples which illustrate how we can use a `lambda` to make our code more concise and not clutter up the namespace.
+
+We start with an *unordered* datatype - a *dictionary* - which contains `key:value` pairs.
+
+```python=
+d = {
+    'dick': 8,
+    'tom': 21,
+    'harry': 16
+}
+```
+
+We want to sort the data in the dictionary by the length of its keys - the length of each name in this case.
+
+In order to sort a *dictionary* we can use the `sorted()` built-in function - the problem is that this function only accepts *sequences* so we will first of all transform our *dictionary* into a *list* of *tuples*
+
+```python=
+d_list = list(d.items())
+print(d_list)
+```
+
+```
+[('dick', 8), ('tom', 21), ('harry', 16)]
+```
+
+We can now use the `sorted()` function to sort the key:value pairs - this function takes an optional argument called `key` which lets us pass a *function* to `sorted()` which will determine how we want the given data to be sorted.
+
+>[!NOTE]
+>The `key` argument we pass to the `sorted()` function is itself a *function* - we could therefore use a `lambda` instead of a regular function
+
+We will first look at how we could sort the `key:value` pairs based on the length of the keys by using a regular function - this is not the recommended way but will help us understand how the `lambda` way is better.
+
+```python=
+def length_of_name(kv_pair):
+    return len(kv_pair[0])
+
+sorted_data = sorted(d.items(), key=length_of_name)
+print(sorted_data)
+```
+
+```
+[('tom', 21), ('dick', 8), ('harry', 16)]
+```
+
+This works and we get the original data from the dictionary sorted by the length of the keys - but it is not the most efficient solution to the problem since we define a regular function for simple functionality which would be better coded as a `lambda`
+
+We will now look at the better solution which uses a `lambda` as the function which is passed to `sorted()` as the value of the optional `key` function.
+
+```python=
+sorted_data_better = sorted(d.items), key=lambda kv_pair: len(kv_pair[0])
+print(sorted_data_better)
+```
+
+```
+[('tom', 21), ('dick', 8), ('harry', 16)]
+```
+
+In our second example we will sort the original dictionary data by the square root of the values - this again is best done using a `lambda`
+
+```python=
+import math
+
+data_sorted_values = sorted(d.items(), key=lambda kv_pair: math.sqrt(kv_pair[1]))
+print(data_sorted_values)
+```
+
+```
+[('dick', 8), ('harry', 16), ('tom', 21)]
+```
+
 ## Object Oriented Programming
 
 OOP is a way of doing programming - it is a paradigm related to how we go about writing code and developing projects.
