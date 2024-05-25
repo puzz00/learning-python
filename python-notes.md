@@ -1610,21 +1610,48 @@ print(jane.salary())
 
 ## Working with Files
 
-### Reading
+Working with files is easy in python but it does pose problems in that we are not just working with python - we are working with files which might contain bad data and we are interacting with operating systems which might cause problems - maybe the file cant be opened not because of incorrect python code but because the user python is running as does not have the necessary permissions to work with the specified file. We also need to consider the user of our program - they might make mistakes such as choosing to try to save their file in a directory they dont have write access to. Even a working environment or hardware itself can mess things up when we are working with files since the files are stored in secondary memory such as a hard drive - hard drives fail sometimes.
 
-#### Open and Read
+>[!IMPORTANT]
+>We need to consider how we can manage errors gracefully to help the users of our programs if and when errors occur - this is especially important when working with files since the user | the OS or even a working environment can mess up our programs
 
-We can open files and work with their contents.
+### Interactions
 
-The `open()` function returns a *file* object which we can then work with. The *open()* function accepts lots of arguments - the only necessary one is the path to the file which we want to open - this can be an *absolute* or *relative* path.
+Python does not interact *directly* with files. The files are stored in secondary memory such as a hard drive whilst python is a running process. Python interacts with the *Operating System* which in turn interacts with the files.
 
-Once we have the *file* object captured in a variable, we can access its contents using the `read()` method.
+The OS therefore acts as a guardian of the files - this is important because it is possible to destroy operating systems or applications when we work with files - the security of files is also important - we dont want unauthorized users accessing sensitive data.
+
+>[!IMPORTANT]
+>The OS manages the files and our python code interacts with the OS
 
 >[!NOTE]
->When we read the contents of a file using `read()` a *cursor* is used
+>The OS creates a *file descriptor* when we open a file using python - this is simply an integer which points to an entry in the kernels global file table where data about the open file is stored
+
+As an example of this, if we want to read eight bytes of a .txt file our python codes lets the OS know that we want to do this. The OS checks and if it can get those eight bytes it copies them into memory in a shared space where the python process can retrieve them - the bytes in the original file are not accessed directyly by our python code.
+
+### Important Concepts
+
+The two important concepts to know about when we are working with files in python are the *open mode* and *file cursors*.
+
+#### Open Mode
+
+We can open a file in python using the `open()` function. This returns a *file object* which can be captured in a variable.
+
+The *open()* function accepts lots of arguments - the only necessary one is the path to the file which we want to open - this can be an *absolute* or *relative* path.
+
+When we open a file with the `open()` function we can specify a mode as an optional argument. This is important because if we specify a mode such as *read* and then try to *write* to the file we will encounter an error. The most common modes are:
+
+- `r` which opens the file for reading
+- `w` which opens the file for writing - it will overwrite the entire file
+- `a` which opens the file with the *cursor* at the end of the file contents so we will append to it
+- `r+` which opens the file for *reading* and *writing* with the cursor at the beginning
+
+>[!NOTE]
+>The default mode which is used if no other is specified - this is done as the second argument - is *read*
 
 ```python=
-file = open("test.txt")
+file = open("test.txt") # the default open mode of r is used
+>>>>>>> 99285ca41e473cdee5c77b8ec7a1ec9ce28b17ac
 print(file) # file contains a file object
 contents = file.read()
 print(contents) # we now see the contents of the file
@@ -1637,13 +1664,15 @@ This is line two.
 This is line three.
 ```
 
-#### Seek and Cursors
+#### Cursor or Pointer
 
-When a file is *open* there is a connection between it and python - this means that if we edit the file and save the changes whilst the file is open the changes will be found inside python. The cursor determines where in the file we are reading from.
+The *cursor* essentialy points to a location in the data of the file. We can picture a file as a sequence of *bytes* and the cursor points to which byte we are on.
+
+The cursor determines where in the file we are reading or writing from.
 
 If the file has been completely read, the cursor will be at the end of the file so if we read it again we will have an empty string returned. If we add changes to the file and then read it again the cursor will read the changes as it was at the end of the original contents.
 
-In order to send the cursor back to the beginning of a file we can use `seek(0)` and of course we can specify other indexes as the argument.
+In order to send the cursor back to the beginning of a file we can use `seek(0)` and of course we can specify other positions as the argument.
 
 ```python=
 contents_2 = file.read() # returns empty as cursor is at end
@@ -1660,9 +1689,67 @@ This is line two.
 This is line three.
 ```
 
+>[!TIP]
+>To find where the cursor is we can use the `.tell()` method
+
+### More on Reading Files
+
+We can specify how many *bytes* we want to read by adding the number as an argument for the `.read()` method.
+
+```python=
+file.seek(0)
+contents_4 = file.read(12)
+print(contents_4)
+```
+
+```
+This is line
+```
+
+>[!IMPORTANT]
+>It is dangerous to read the *entire* contents of large files - remember - the OS copies the bytes from the original file into *primary memory* which is not as large as *secondary memory* and can quickly become full
+
+#### Using readline()
+
+To get around the problem of reading large .txt files we can use the `readline()` function which will only get the data from the file up to a `\n`
+
+>[!NOTE]
+>The `readline()` function returns the `\n` as well as other data
+
+Reading one line of a large file at a time is common - there is a better way to do this than using the `readline()` function.
+
+#### File Objects and the Iterator Pattern
+
+Remember - a *file object* is returned from the `open()` function.
+
+These *file objects* are *iterable* - this means we can iterate over them using a `for` loop.
+
+The result of this is very similar to `readline()` in that we get the contents of the file line by line.
+
+```python=
+f = open('massive_book.txt')
+massive_contents = ''
+for line in f:
+    massive_contents += line
+print(massive_contents)
+```
+
+```
+This is line one.
+This is line two.
+This is line three.
+This is line four.
+This is line five.
+Okay - not massive but just to illustrate a point.
+```
+
 #### Close
 
-We are using system resources by having an open connection to a file. We need therefore to *close* the file once we have finished working with it.
+We are using system resources by having a file open. This is because the OS has to allocate resources to keep track of what is happening with the open files. The OS needs to monitor everything we are doing with open files - this means that resources are used to do the monitoring.
+
+If we open too many files without closing them we can run out of memory and our system could crash.
+
+We need therefore to *close* the file once we have finished working with it. We just need to call the `close()` method on the *file object* we have open.
 
 >[!TIP]
 >We can check if a file has been closed by using the `.closed` attribute
@@ -1671,6 +1758,171 @@ We are using system resources by having an open connection to a file. We need th
 print(file.closed)
 file.close()
 print(file.closed)
+f.close()
+print(f.closed)
+```
+
+```
+False
+True
+True
+```
+
+### Writing
+
+We can use the `w` *open mode* if we want to write to a file - if the file does not already exist it will be created.
+
+```python=
+f = open("new_book.txt", "w") # we specify the open mode to be w for write
+f.write("hello world!")
+f.close()
+f = open("new_book.txt", "r")
+contents = f.readline()
+print(contents)
+f.close()
+```
+
+```
+hello world!
+```
+
+>[!CAUTION]
+>As soon as we open a file using the `w` open mode the entire contents of the file will be truncated and therefore lost
+
+```python=
+f = open("new_book.txt", "w")
+f.close() # we didnt do anything but the contents have now gone
+f = open("new_book.txt", "r")
+contents = f.read()
+print(f"Nothing here: {contents}")
+f.close()
+```
+
+```
+Nothing here: 
+```
+
+#### Flushing Data
+
+We need to remember that we are not working *directly* with the data stored on the hard drive - we are interacting with the OS.
+
+The OS does not write the data we specify to be written immediately - that would cause a loss of performance as it would need to keep accessing the hard drive which is slow.
+
+The OS stores the data we want it to write to the file - it stores it in *primary memory* in a buffer. After some time - this will depend on the OS configuration - the data is flushed drom the buffer to the hard drive. This means that we will not see changes taking place in real time.
+
+If we want to force the transfer of the data to the hard drive we can use the `.flush()` method.
+
+>[!NOTE]
+>The buffer is flushed when the `.close()` method is called.
+
+```python=
+f = open("new_book.txt", "w")
+f.write("this is some new writing\n") # this does not appear immediately - it is buffered
+f.flush() # this forces the data to be written to the hard drive
+f.write("here is some more writing") # not written to the hard drive immediately
+f.close() # flushes the data to the hard drive
+
+f = open("new_book.txt", "r")
+contents = f.read()
+print(contents)
+```
+
+```
+this is some new writing
+here is some more writing
+```
+
+#### Appending Data
+
+If we dont want to lose the original data in a file which already exists, we can use the `a` method which places the cursor at the end of the original data and then lets us *append* data to it.
+
+>[!TIP]
+>We can use the `.tell()` method to see where the cursor is
+
+```python=
+f = open("new_book.txt", "a") # the data will not be lost
+print(f.tell()) # shows the cursor is at the end of the data
+f.write("\nlook at this - it is yet more writing\n")
+f.close()
+
+f = open("new_book.txt", "r")
+contents = f.read()
+f.close()
+print(contents)
+```
+
+```
+50
+this is some new writing
+here is some more writing
+look at this - it is yet more writing
+```
+
+>[!IMPORTANT]
+>We cannot control the cursor position using `seek()` in *append mode* - the data will *always* be added at the end even if we use `seek(0)`
+
+#### Read and Write
+
+We can read and write using the `r+` open mode.
+
+>[!TIP]
+>We can check if a file is *readable* or *writeable* using the `.readable()` and `.writeable()` methods which return `True` or `False`
+
+This mode will let us read the data and write data - the cursor is moved to the beginning when we use this mode.
+
+>[!CAUTION]
+>The data we write to the file will always replace the original data - it will not shift data across - this is similar to the pain in the :horse: *insert* key on our keyboard
+
+### Using the `with` Context Manager
+
+The `with` context manager gives us a great way to work with files - and other tasks which involve an entry and exit - since it *closes* the resources for us.
+
+This is important because as we have seen every time we open a file the OS has to allocate resources to monitor our interaction with it. If we open too many files without closing them then the system could crash.
+
+We might think that we are able to remember to *close* files once we have finished working with them - but the reality is that when we are working with lots of open files we may well forget to do so.
+
+In addition to this, we need to consider what happens if an *exception* occurs during the file management process. In this case if we are not working in the `with` context manager then the file will *not* be closed because the exception occurs before that happens.
+
+```python=
+f = open("./test.txt", "a")
+f.write(hello) # this throws an error
+f.close() # the file is never closed
+print(f.closed) # this is False
+```
+
+```
+False
+```
+
+To help avoid files remaining open without our knowing it due to exceptions occuring during their management we can use a `try | except | finally` block.
+
+```python=
+f = open("./test.txt", "a")
+try:
+    f.write(hello) # file management logic goes here
+except:
+    print("Error")
+finally:
+    f.close() # this happens no matter exception or not
+print(f.closed) # this is now True
+```
+
+```
+True
+```
+
+The problem with the `try | except | finally` block is that even though it works it can be tricky to remember to use it all of the time.
+
+Python makes this closure of open resources even if they encounter errors much easier - it implements the `with` context manager.
+
+It is quite simple - the `with` block contains the code to manage the file and it will automatically close the file no matter its state once the block is exited.
+
+```python=
+with open("./test.txt", "a") as f:
+    # we put all the file management logic in the with block
+    print(f.closed) # shows the file is open
+    f.write(hello) # throws the error
+print(f.closed) # True as the file has been closed despite its state
 ```
 
 ```
@@ -1678,27 +1930,5 @@ False
 True
 ```
 
-#### Simplifying the Process Using a `with` Statement
-
-We can simplify this code by using the `with` `as` keywords - we do not have to close the file as the `with` keyword will do this automatically.
-
-```python
-with open("file.txt") as file:
-    contents = file.read()
-    print(contents)
-```
-
-### Writing
-
-We can use similar syntax to reading files to write to files.
-
-```python
-with open("file.txt", mode="w") as file:
-    file.write("hello world!")
-```
-
-We need to use `"w"` as the mode so we can write to the file. This will overwrite the contents of the file.
-
->[!TIP]
->We can use `mode="a"` if we want to *append* data to a file
-
+>[!NOTE]
+>We still need to specify the *open mode* when we are using `with` and a cursor is still used
