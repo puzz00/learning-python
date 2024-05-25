@@ -713,6 +713,85 @@ greeting()
 hello!
 ```
 
+## Functions as First Class Objects
+
+Functions in python are first class objects - this means that they can be used like other objects such as *strings* and *integers*.
+
+Here are some interesting things we can do with functions in python:
+
+- Assign them to variables
+- Pass them as parameters to other functions
+- Store them in collections such as lists
+- Return them from other functions
+
+Let's see a few examples.
+
+The first example shows how we can store functions in variables.
+
+```python=
+def add(a, b):
+    return a + b
+
+def subtract(a, b):
+    return a - b
+
+add_alias = add # we use a function as a value for a variable
+add_alias(5, 8) # we can call the function add() which is the value assigned to add_alias
+```
+
+```
+13
+```
+
+This second example shows how we can store functions in collections such as lists.
+
+```python=
+l1 = [add, subtract] # we store functions in a list
+l1[1](8, 2) # we can use indexing to access specific functions in the list
+```
+
+```
+6
+```
+
+The third example shows how we can pass functions as arguments to other functions.
+
+```python=
+def compute(a, b, operation): # this function takes a function as a parameter called operation
+    return operation(a, b)
+
+print(compute(8, 3, add)) # we pass the add function as an argument to compute()
+print(compute(8, 3, subtract)) # we pass the subtract function as an argument to compute()
+```
+
+```
+11
+5
+```
+
+>[!NOTE]
+>We do not add `()` when passing functions as arguments to other functions
+
+This final example shows how we can return functions from other functions.
+
+```python=
+def resolve_function(name):
+    if name == 'add' or name == 'sum':
+        return add # we return a function
+    else:
+        return subtract # we return a function
+
+fn1 = resolve_function("sum") # we store the returned function in a variable called fn1
+print(fn1(8, 2))
+fn2 = resolve_function("subtract") # we test the else part of resolve_function()
+print(fn2(8, 2))
+```
+
+```
+10
+6
+```
+
 ## Object Oriented Programming
 
 OOP is a way of doing programming - it is a paradigm related to how we go about writing code and developing projects.
@@ -1533,14 +1612,73 @@ print(jane.salary())
 
 ### Reading
 
-We can open tiles using syntax as shown below.
+#### Open and Read
 
-```python
-file = open("file.txt")
+We can open files and work with their contents.
+
+The `open()` function returns a *file* object which we can then work with. The *open()* function accepts lots of arguments - the only necessary one is the path to the file which we want to open - this can be an *absolute* or *relative* path.
+
+Once we have the *file* object captured in a variable, we can access its contents using the `read()` method.
+
+>[!NOTE]
+>When we read the contents of a file using `read()` a *cursor* is used
+
+```python=
+file = open("test.txt")
+print(file) # file contains a file object
 contents = file.read()
-print(contents)
-file.close()
+print(contents) # we now see the contents of the file
 ```
+
+```
+<_io.TextIOWrapper name='test.txt' mode='r' encoding='UTF-8'>
+This is line one.
+This is line two.
+This is line three.
+```
+
+#### Seek and Cursors
+
+When a file is *open* there is a connection between it and python - this means that if we edit the file and save the changes whilst the file is open the changes will be found inside python. The cursor determines where in the file we are reading from.
+
+If the file has been completely read, the cursor will be at the end of the file so if we read it again we will have an empty string returned. If we add changes to the file and then read it again the cursor will read the changes as it was at the end of the original contents.
+
+In order to send the cursor back to the beginning of a file we can use `seek(0)` and of course we can specify other indexes as the argument.
+
+```python=
+contents_2 = file.read() # returns empty as cursor is at end
+print(f"Nothing here: {contents_2}")
+file.seek(0) # resets the cursor to index 0
+contents_3 = file.read() # returns all data
+print(contents_3)
+```
+
+```
+Nothing here: 
+This is line one.
+This is line two.
+This is line three.
+```
+
+#### Close
+
+We are using system resources by having an open connection to a file. We need therefore to *close* the file once we have finished working with it.
+
+>[!TIP]
+>We can check if a file has been closed by using the `.closed` attribute
+
+```python=
+print(file.closed)
+file.close()
+print(file.closed)
+```
+
+```
+False
+True
+```
+
+#### Simplifying the Process Using a `with` Statement
 
 We can simplify this code by using the `with` `as` keywords - we do not have to close the file as the `with` keyword will do this automatically.
 
