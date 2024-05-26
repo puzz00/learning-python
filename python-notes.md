@@ -940,6 +940,223 @@ print(data_sorted_values)
 ```
 [('dick', 8), ('harry', 16), ('tom', 21)]
 ```
+## Functional Programing
+
+Functional programing is just another way to write code - it is a programing paradigm which means a way of seeing programing.
+
+There is a lot of theory on *functional programing* but in these notes we are going to be focusing on using it in a practical way - we like to be pragmatic.
+
+Python itself is not strictly a *functional programing* language - but we can use it to implement our code in a *functional programing* way or to borrow ideas from it.
+
+### Simple Definition
+
+Our simple definition of *functional programing* is that it is a programing paradigm which favors:
+
+- Using functions as first class objects
+- Using *immutable* solutions in preference to *mutable* ones to avoid *side effects*
+
+We have gone over what it means to say that functions in python are *first class objects* - simply put it means we can do things such as pass functions as arguments to other functions and return them from functions.
+
+We will quickly look at what an *immutable* solution means.
+
+Most of the time in python we will have a *mutable* and an *immutable* solution to a problem - we as developers have the choice - we will tend to use the *immutable* solution if we are working with a *functional programing* approach to our code.
+
+>[!IMPORTANT]
+>We are not saying that *immutable* solutions are better than *mutable* ones - both are useful at some point - but we are saying that if we are leaning towards a *functional programing* approach we will favor the *immutable* solutions
+
+A simple example could be a user of a web app adding items to a shopping cart. For this our code uses a *list* data structure.
+
+```python=
+items = ["spam", "eggs"]
+```
+
+The user then adds another item to their cart - the *mutable* solution is this:
+
+```python=
+items.append("ham")
+```
+
+If we look at items before and after this line of code we will see that it has *mutated* - we have changed the data in the original *list object*
+
+```python=
+items = ["spam", "eggs"]
+print(items)
+items.append("ham")
+print(items)
+```
+
+```
+['spam', 'eggs']
+['spam', 'eggs', 'ham']
+```
+
+The *immutable* solution will not change the data in the original list.
+
+```python=
+items = ["spam", "eggs"]
+print(items)
+new_items = items + ["ham"]
+print(new_items) # same result as the mutable solution
+print(items) # but the original list has not mutated - this helps prevent side effects
+```
+
+```
+['spam', 'eggs']
+['spam', 'eggs', 'ham']
+['spam', 'eggs']
+```
+
+### Progression
+
+We have seen how we can define a *functional programing* approach simply as favoring the use of functions as first class objects and immutable solutions.
+
+As *functional programing* evolved over time programers developed three functions which form the backbone of this approach - they are useful to know and be able to use. The functions are:
+
+- map()
+- filter()
+- reduce()
+
+All of these functions take two arguments - the first is a *function* and the second is an *iterable object* such as a *list*
+
+The given function will be applied to each element in the iterable and a new object will be returned which means we are using an *immutable* solution to transforming data.
+
+>[!NOTE]
+>`map()` and `filter()` return a *collection* whereas `reduce()` returns a single element
+
+### map()
+
+The idea behind `map()` is that we give it data and we receive back a transformed version of that data.
+
+This is achieved by specifying a *function* which we want `map()` to apply to every element in an *iterable* object such as a *list* which we also specify.
+
+A *map object* will be returned - we tend to convert this into a *list* object.
+
+The following diagram will hopefully help with conceptual understanding.
+
+![map](/images/1.png)
+
+Here is an example which shows how we can use `map()` to transform a list of names into a list of their lengths - the *string* datatypes are *transformed* into *integer* datatypes.
+
+```python=
+names = ["tom", "dick", "harry"]
+names_mapped = map(lambda name: len(name), names) # we use a lambda as the function to pass to map()
+print(names_mapped) # a map object has been returned
+name_lengths = list(names_mapped) # we convert the map object into a list
+print(name_lengths)
+print(names) # not mutated
+```
+
+```
+<map object at 0x7f480418bc70>
+[3, 4, 5]
+['tom', 'dick', 'harry']
+```
+
+Another way to understand what is happening is to think about how `map()` is working on each element.
+
+```
+Collection: [x0, x1, x2 ... xj]
+Function: f(x) => y
+Result: [y0, y1, y2 ... yj]
+
+x0 => f(x0) => y0
+x1 => f(x1) => y1
+x2 => f(x2) => y2
+...
+xj => f(xj) => yj
+```
+
+In this next example we see how we can create a new *list* of squared numbers based on a *list* of numbers we want to square.
+
+```python=
+numbers = [3, 4, 5]
+squared = list(map(lambda num: num ** 2, numbers)) # create a list from the returned map object
+print(squared)
+print(numbers) # not mutated
+```
+
+```
+[9, 16, 25]
+[3, 4, 5]
+```
+
+### filter()
+
+This function takes input from an *iterable* object and applies a specified function to each element in it. The function needs to return either `True` or `False`
+
+If the returned value is `True` the `filter()` function will keep that element - it will filter it out if the returned value is `False`
+
+The following diagram will hopefully help with conceptual understanding.
+
+![filter](/images/2.png)
+
+The function given as the first argument in `filter()` is once again often a `lambda`
+
+```python=
+names = ["Harry", "Tom", "Dick"]
+filtered_names = filter(lambda name: len(name) >= 4, names) # keeps names which have at least 4 chars
+print(list(filtered_names))
+```
+
+```
+['Harry', 'Dick']
+```
+
+A more formal way of looking at `filter()` is given below.
+
+```
+Collection: [x0, x1 ... xj]
+Function: f(x) => y (bool, True|False)
+Result: [x0 if y0 is True, x1 if y1 is True ... xj if yj is True]
+```
+
+>[!NOTE]
+>As seen above - the returned *filter object* includes the original objects not transformed versions of them
+
+Another example here shows how we can filter the original list of names so only names which have an odd number of characters in them are kept.
+
+```python=
+names = ["Tom", "Dick", "Harry"]
+odd_names = list(filter(lambda name: len(name) % 2 == 1, names))
+print(odd_names)
+print(names) # note how this is still not mutated
+```
+
+```
+['Tom', 'Harry']
+['Tom', 'Dick', 'Harry']
+```
+
+### reduce()
+
+>[!IMPORTANT]
+>`reduce()` is rarely seen in python code - Guido van Rossum hates it and it was dropped from the python standard library for python3
+
+The `reduce()` function will only be mentioned in these notes rather than gone into in detail since it is not pythonic but we feel it should at least be mentioned.
+
+Essentialy, the `reduce()` function takes the original elements passed to it from the *iterable* and then combines them into one element which is returned.
+
+It was dropped from python3 because it gets very complicated very quickly. Developers using python tend to switch to using a `for` loop instead of using `reduce()` since the code is easier to follow and the results are the same.
+
+This brings us back to a point we made at the start of our notes on *functional programing* - python is not strictly a *functional programing* language.
+
+>[!NOTE]
+>If we insist on using `reduce()` for some weird reason - we can `import functools` to get it when using python3
+
+For some more context as to why `reduce()` was dropped - please [read here](https://www.artima.com/weblogs/viewpost.jsp?thread=98196)
+
+### Conclusion
+
+We can use python in a *functional programing* way but we do not have to - we can mix different ways of coding.
+
+`map()` and `filter()` are used in python but `reduce()` is rarely seen - use a `for` loop instead.
+
+There is a more pythonic way to go about things - this is called *list comprehension* and is *much* more common in python code than `map()` and `filter()` - we will be looking at *list comprehension* and how we can make our code more pythonic in the next section of these notes :smiley:
+
+## List Comprehension
+
+- [x] Sub-heading
+- [ ] Everything else
 
 ## Object Oriented Programming
 
