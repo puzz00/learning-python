@@ -1155,8 +1155,168 @@ There is a more pythonic way to go about things - this is called *list comprehen
 
 ## List Comprehension
 
-- [x] Sub-heading
-- [ ] Everything else
+List comprehension is a more pythonic way of doing `map()` and `filter()` - it is syntactic sugar for these two functions which is why it is useful to understand them before learning list comprehension.
+
+The syntax for list comprehension can be summed up as `<EXPRESSION> for elem in <ITERABLE COLLECTION>` which looks much better and is easier to understand than what we saw with `map()` using *lambdas*
+
+The `<EXPRESSION>` part is the same as the *lambda* function we used with `map()`
+
+The `for` part is the same as a regular `for` loop.
+
+The `<ITERABLE COLLECTION>` is the same as when we passed an *iterable object* to `map()`
+
+If we go back to our example of transforming names into their lengths we can see how the more pythonic list comprehension goes about it.
+
+```python=
+names = ["Tom", "Dick", "Harry"]
+name_lengths = [len(name) for name in names] # a list is returned from this list comprehension
+print(name_lengths) # same result as when we used map() with a lambda
+print(names) # still not mutated - this is an immutable solution
+```
+
+```
+[3, 4, 5]
+['Tom', 'Dick', 'Harry']
+```
+
+>[!NOTE]
+>The name we give to the element - in this case `name` - needs to be the same in the *expression* - in this case `len(name)`
+
+Another example given here will show list comprehension solving the same problem we had in the `map()` section of these notes where we wanted to create a new list of squared numbers.
+
+```python=
+numbers = [2, 3, 4, 5]
+squared_numbers = [n ** 2 for n in numbers] # the list comprehension
+print(numbers) # not mutated
+print(squared_numbers) # same output as before
+```
+
+```
+[2, 3, 4, 5]
+[4, 9, 16, 25]
+```
+
+We can see that list comprehensions are:
+
+- Immutable
+- Concise
+- Do not need us to use *imperative* procedures
+
+Regarding the last point we can consider what the *imperative procedure* would be for solving the problem of squaring the numbers.
+
+```python=
+numbers = [2, 3, 4, 5]
+squared_numbers = []
+for n in numbers:
+    squared_numbers.append(n ** 2)
+print(numbers)
+print(squared_numbers)
+```
+
+Whilst the *imperative* way of solving this problem as shown above works - it is not as concise as using a list comprehension | it is not immutable - the `.append()` method mutates `squared_numbers` - and it is not pythonic.
+
+### Conditional List Comprehension
+
+So far we have seen how using a list comprehension can help us solve the same problems as we solved using `map()` but more concisely and more pythonically.
+
+We can use list comprehensions which include a condition to solve the same problems as we solved using the `filter()` function.
+
+The syntax can be summed up as `<EXPRESSION> for elem in <ITERABLE COLLECTION> if <CONDITION>`
+
+Coming back to our example of using `filter()` to create a list of names which had four or more characters we can solve it using a list comprehension as seen below.
+
+```python=
+names = ["Tom", "Dick", "Harry"]
+long_names = [name for name in names if len(name) >= 4] # list comprehension with condition
+print(names) # not mutated
+print(long_names) # same result - a filtered list
+```
+
+```
+['Tom', 'Dick', 'Harry']
+['Dick', 'Harry']
+```
+
+We can now look at using a conditional list comprehension to solve the problem we looked at earlier in the `filter()` section of creating a list of names which have an odd number of letters.
+
+```python=
+names = ["Tom", "Dick", "Harry"]
+odd_names = [name for name in names if len(name) % 2 == 1] # conditional list comprehension
+print(names) # not mutated
+print(odd_names) # same result as with filter() and a lambda
+```
+
+```
+['Tom', 'Dick', 'Harry']
+['Tom', 'Harry']
+```
+
+### True Power of List Comprehension
+
+In some other languages - :eyes: we are looking at *you* javascript :eyes: - the syntax to combine `map()` and `filter()` can get quite ugly.
+
+An example in python which replicates this mess is shown below for an example which uses `map()` to transform a name into its length and `filter()` to make sure only names which have more than three characters in them are included in the new list.
+
+```python=
+names = ["Tom", "Dick", "Harry", "Steven"]
+# what a mess this is
+long_new_names = list(
+    map(
+        lambda name: len(name),
+        filter(lambda name: len(name) > 3, names)
+    )
+)
+print(names)
+print(long_new_names)
+```
+
+```
+['Tom', 'Dick', 'Harry', 'Steven']
+[4, 5, 6]
+```
+
+Fortunately we are learning to be pythonic so we can ignore that mess and use list comprehensions instead - we will see their true beauty and power here.
+
+```python=
+names = ["Tom", "Dick", "Harry", "Steven"]
+long_new_names = [len(name) for name in names if len(name) > 3] # what a relief this is
+print(names) # not mutated
+print(long_new_names) # same result as before
+```
+
+```
+['Tom', 'Dick', 'Harry', 'Steven']
+[4, 5, 6]
+```
+
+To more clearly see the beauty and power of pythonic list comprehension - if not convinced already - we will look at a different example in which we have created a - much better - version of twitter.
+
+We want to get a list of usernames for users who have never tweeted so we can send them ~~spam~~ emails letting them know the benefits of tweeting and why it is wonderful.
+
+We will use the pythonic way in the example.
+
+```python=
+# we generate the data
+users = [
+    {"username": "dduck", "tweets": ["puddles are great"]},
+    {"username": "ysam", "tweets": []},
+    {"username": "mmouse", "tweets": ["i love minnie", "cheese is nice"]},
+    {"username": "tcat", "tweets": []},
+    {"username": "tpie", "tweets": ["i did i did", "hello pussycat"]}
+]
+
+# we use a pythonic list comprehension to extract the data we want
+users_to_spam = [user["username"] for user in users if not user["tweets"]]
+
+# job done - we now print the usernames of those users who have never tweeted
+print(users_to_spam)
+```
+
+```
+['ysam', 'tcat']
+```
+
+We can see how easy this is to understand and code when we use the list comprehension - it is completed on one line and is human friendly - it is also immutable :smiley:
 
 ## Object Oriented Programming
 
