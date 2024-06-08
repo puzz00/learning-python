@@ -713,6 +713,155 @@ greeting()
 hello!
 ```
 
+### Function Arguments
+
+When we are writing functions we need to consider what data they will need to have in order to work as we want them to.
+
+As an example - we might be creating a function which will work as a - very - simple calculator and return the answer to a calculation which uses two numbers. We will need to think about what it will require in order to work.
+
+In this example our function will need the two numbers and the operation.
+
+The whole point of this function is that different numbers and operations can be sent to it so different output will be returned.
+
+Now we know the data it will need - we need a way to reserve memory for these data - we do this using *parameters*
+
+The *parameters* of a function are specified inside the `()` of the function definition.
+
+```python
+def calculate(x, y, operation):
+    pass
+```
+
+>[!NOTE]
+>The `pass` keyword can be used when we dont have code to put into our function *yet* - it means we can still execute our programs without having python throw an error
+
+One way to think about the parameters of a function is to think about making a sandwich.
+
+The steps in the recipe to make the sandwich are the instructions inside the function whilst the ingredients and quantity of sandwiches needed are the parameters.
+
+```python
+def make_sandwich(bread, oil, filling, quantity):
+    pass
+```
+
+This means we can use the `make_sandwich` function to make different kinds of sandwich - cheese | ham | donkey - with different kinds of bread - white | brown | stale - and in different quantities - one | two | twenty.
+
+The point is that the *parameters* of a function allow us to get different output returned from it.
+
+Coming back to the `calculator` function we could do something like the following:
+
+```python
+def calculate(x, y, operation):
+    if operation == "add":
+        return x + y
+    elif operation == "subtract":
+        return x - y
+    elif operation == "multiply":
+        return x * y
+    elif operation == "divide":
+        return x / y
+    else:
+        return "error"
+```
+
+We could then use the `calculate` function to get the answers to various binary operations - binary in that there are two numbers involved.
+
+This is where we come to *arguments*
+
+The *arguments* are the actual *data* we send to the function.
+
+The *parameters* are spaces in memory which are waiting for the data from the *arguments*
+
+An example to make this more clear:
+
+```python
+result = calculate(8, 2, "add") # we pass data as arguments which will fill the parameters
+print(result) # will print 10 as 8 + 2 = 10
+
+difference = calculate(8, 2, "subtract") # we pass data as arguments which will fill the parameters
+print(difference) # the result will be 6 as 8 - 2 = 6
+```
+
+>[!NOTE]
+>The same `calculate` function is called - we get different *output* because we pass different *arguments* to it
+
+If we do something like `difference = calculate(2, 8, "subtract")` we will get a different result as the arguments we pass will match the order of the parameters in the function definition.
+
+>[!NOTE]
+>These are called *positional arguments* since the position matters - we can also have *keyword arguments* which we will look at next
+
+#### Keyword Arguments
+
+Sometimes - especially when we have lots of parameters for a function - we will want to make it clear what each argument refers to.
+
+Consider the following example:
+
+```python
+savings = get_savings(3_000, 50, 1000, 500)
+```
+
+It is very hard to know what each argument means.
+
+In cases such as this - it makes sense to use *keyword arguments* aka *named arguments*
+
+If we use *keyword arguments* it makes our code much easier to understand:
+
+```python
+savings = get_savings(salary=3_000, energy_cost=50, rent=1000, food_cost=500)
+```
+
+The names given need to match those used in the *parameters* of the function definition:
+
+```python
+def get_savings(salary, energy_cost, rent, food_cost):
+    return salary - energy_cost - rent - food_cost
+```
+
+>[!IMPORTANT]
+>When we use *keyword arguments* we do not have to put them in the same order as the *parameters* of the function but it is *highly recommended* that we *do* match the order
+
+It is possible to mix *keyword arguments* with *positional arguments* if this seems more appropriate.
+
+In our current example, perhaps we consider it as obvious that the first and - hopefully - largest value will be the monthly salary so we might decide just to use a *positional argument* for it and then *keyword arguments* for the less obvious values.
+
+```python
+savings = get_savings(3_000, energy_cost=50, rent=1_000, food_cost=500)
+```
+
+It is up to us as programers whether or not to use *positional* or *keyword* arguments or a mixture of them.
+
+>[!NOTE]
+>We often see *keyword arguments* written as `kwargs`
+
+#### Default Parameters
+
+Sometimes we will define functions which most of the time will use the same value for a parameter.
+
+If this is the case, we can make life easier for ourselves and others who are going to use our code by giving the parameter a *default* value.
+
+In this example we are going to define a function which returns a number raised to a power - obviously a silly example but just to illustrate how to use *default parameters*
+
+We assume that the most common exponent will be 2 so we set this value as a *default parameter* in the function definition.
+
+```python
+def power(x, power=2):
+    return x ** power
+```
+
+Now we can invoke this function with just a number and it will be squared.
+
+```python
+result = power(8)
+print(result) # will print 64
+```
+
+It is still possible to specify different values for the `power` parameter - we just override the default value by specifying a different value in the arguments we pass to the function.
+
+```python
+result = power(8, power=3)
+print(result) # will print 512
+```
+
 ## Functions as First Class Objects
 
 Functions in python are first class objects - this means that they can be used like other objects such as *strings* and *integers*.
