@@ -2458,3 +2458,176 @@ True
 
 >[!NOTE]
 >We still need to specify the *open mode* when we are using `with` and a cursor is still used
+
+## Working with HTTP
+
+We can *install* the *requests* library using `a`
+
+The *requests* library lets us work with *http* using python.
+
+Once we have installed the *requests* library we will need to *import* it into our python code using `import requests`
+
+>[!NOTE]
+>When we *import* non-standard python libraries we do so at the start of our code
+
+### GET Request
+
+We can use the *requests* library to perform different operations using *HTTP* verbs.
+
+The first one to think about is the *GET* request. We can *get* a resource using the `.get()` method. This method takes various arguments - we must include the *path* of the resource we want to *get*
+
+>[!NOTE]
+>For these examples we will be using [httpbin](https://httpbin.org) which lets us test different types of http request
+
+```python
+import requests
+
+resp = requests.get("https://httpbin.org/html")
+print(type(resp))
+```
+
+We see that we get a *requests Response* object returned. These objects contain lots of methods and attributes which are useful for when we are working with http
+
+In this first example we are getting a simple piece of *html* returned to replicate what would be returned by an http request to a website.
+
+We can take a look at the *html* which has been returned by the server using `print(resp.text)`
+
+This will show us what is in the http *body* of the server response.
+
+We can have a look at the *headers* of the server response by using `print(resp.headers)`
+
+#### JSON GET Request
+
+We can get json data returned from servers. This is usually the case when we are requesting data from an *API*
+
+```python
+import requests
+
+resp = requests.get("https://httpbin.org/get")
+print(resp.headers) # shows that the Content-Type is now application/json
+```
+
+We can access more specific data from the response by using `[]` to specify the *header* we are interested in `print(resp.headers["Content-Type"]`
+
+When we get *json* data returned we can use the `.json()` method to have it returned and then parsed into a python *dictionary* data-type which will make it easier to work with.
+
+```python
+import requests
+
+resp = requests.get("https://httpbin.org/get")
+data = resp.json()
+print(type(data)) # shows a dict type
+```
+
+#### GET Parameters
+
+Since http get requests do not take a body like post requests do, if we need to pass arguments with them we do so in the url itself as a *query string*
+
+To send arguments with our get requests using the python requests library we can use the `params=` keyword argument of the `.get()` method.
+
+In the example below we send `fish` as the value of a parameter called `q` - the google search engine uses a parameter called `q` to handle the query it has been sent - this is what we are imitating here.
+
+```python
+import requests
+
+# create a dictionary which contains the names of the arguments we are sending along with their values
+params = {
+    "q": "fish"
+}
+
+resp = requests.get("https://httpbin.org/get",
+                    params=params) # sends the dictionary of arguments and their values
+
+print(resp.json()["args"])
+```
+
+>[!IMPORTANT]
+>When we want to send arguments using *GET* it is best to put them into a *dictionary* and then pass the dictionary as the value for the `params=` keyword argument rather than putting them into the *URL* directly as a *query string*
+
+#### Setting Headers
+
+We can set the values of our request headers and we can set custom headers.
+
+The best way is to create a dictionary which contains the header names along with their values and then send this dictionary as the value of the `headers=` keyword argument of the `.get()` method.
+
+```python
+import requests
+
+# create a dictionary which contains the names of the headers we are sending along with their values
+headers = {
+    "Accept": "application/json",
+    "X-USER": "anonymous"
+}
+
+resp = requests.get("https://httpbin.org/get",
+                    headers=headers) # sends the dictionary of headers and their values
+
+print(resp.json())
+```
+
+>[!NOTE]
+>Custom headers often begin with `X` as in the example above `X-USER`
+
+### Response Status Code
+
+We can check if a request was successful or not by checking the value of the `.ok` attribute of our returned *requests Response* object like so `print(resp.ok)`
+
+If we see `True` we know our request was successful - this could be a 3XX server response status code as well as a 2XX response status code.
+
+If we see `False` it means our request was not successful.
+
+>[!NOTE]
+>We can check the exact response status code using `print(resp.status_code)`
+
+#### Summary of HTTP Response Status Codes
+
+We will quickly summarize http response status codes here just in case 2XX and 3XX make no sense.
+
+The XX part represent other digits - we can generalize what responses mean by going off their first digit - the rest of the digits give us more detail.
+
+- 2XX | successful request
+- 3XX | redirection
+- 4XX | client side error
+- 5XX | server-side error
+
+### POST Requests
+
+When we use an http *POST* request we are posting data to an online resource. An example of this would be sending login credentials to a login form.
+
+We can use the `.post()` method from the *requests* library to do this.
+
+A common way to post data online is via a form - we can see an example of replicating this below.
+
+```python
+import requests
+
+# create a dictionary which contains the data we want to post
+data = {
+    "username": "dduck",
+    "password": "duckyduckduckducker"
+}
+
+resp = requests.post("https://httpbin.org/post", data=data)
+
+print(resp.json())
+```
+
+#### POST JSON
+
+If we are posting data to an *API* we tend to use a serialized language such as *JSON* or *XML*
+
+To do this we can simply use `json=` instead of `data=`
+
+```python
+import requests
+
+# create a dictionary which contains the data we want to post
+data = {
+    "username": "dduck",
+    "password": "duckyduckduckducker"
+}
+
+resp = requests.post("https://httpbin.org/post", json=data) # we send the data using json encoding
+
+print(resp.json())
+```
