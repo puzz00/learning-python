@@ -2631,3 +2631,92 @@ resp = requests.post("https://httpbin.org/post", json=data) # we send the data u
 
 print(resp.json())
 ```
+### Application Programing Interfaces
+
+An *API* lets us interact with external resources - we use them to get data which we want to use in our programs.
+
+The api is essentially a way to get data from a web app - it will be set up to have rules in place regarding how we can get the data and which data we can get. If we follow these rules we will be able to get what we want.
+
+An abstraction is to see an api as a menu which specifies what we can get from the kitchen of a restaurant.
+
+A more traditional way of developing a web app is to create a *user interface* using html and css on the server - this web app is then requested by clients and the *html code* is sent along with the *data*.
+
+We might however already have the user interface developed - this could be the case with a mobile app which has been built in something like android studio. The user interface in this case has already been developed, so html is not needed from the server - just the data - so a rest api is used.
+
+A single page web app also just needs data to work with as it will use javascript on the frontend to develop the user interface.
+
+We might also just want data from an api to include in our web app such as location data from google maps or moon rise and set times from a weather api - we don't want a load of html as well as the data in these cases.
+
+Fancy user interfaces with lots of html and css are for humans not machines - we could see an api as a web app for web apps - they are more machine friendly because the unnecessary html and css is not sent - just the requested data.
+
+Essentialy with an api we transfer data instead of user interfaces.
+
+#### API Endpoints
+
+An api endpoint is a location which is usually a url such as [ISS Location](http://api.open-notify.org/iss-now.json)
+
+We need to make a request for data - this will be sent to the api endpoint.
+
+>[!NOTE]
+>Data returned from apis is usually JSON but sometimes it will be XML
+
+```python
+import requests
+
+url = "http://api.open-notify.org/iss-now.json"
+
+resp = requests.get(url=url)
+data = resp.json()
+print(data)
+```
+
+As an example of working with data returned from an api we can consider this example in which we extract the *latitude* and *longitude* of the ISS at the current time and store it in a *tuple*
+
+```python
+import requests
+
+url = "http://api.open-notify.org/iss-now.json"
+
+resp = requests.get(url=url)
+data = resp.json()
+
+# extract just the latitude and longitude
+lat = data["iss_position"]["latitude"]
+long = data["iss_position"]["longitude"]
+
+# store the data in a tuple
+iss_location = (lat, long)
+
+print(iss_location)
+```
+
+#### API Parameters
+
+Some apis require us to specify parameterss - the documentation will let us know the format needed including datatypes to send.
+
+Some parameters are required whilst others are optional. The optional params will have default values.
+
+The api [sunrise-sunset](https://api.sunrise-sunset.org/json) takes parameters such as *latitude* and *longitude*
+
+Here is an example of getting the sunrise and sunset times for a specified location - %00 Island - by sending latitude and longitude as parameters to the aforementioned api
+
+```python
+import requests
+
+url = "https://api.sunrise-sunset.org/json"
+
+params = {
+    "lat": 0,
+    "lng": 0
+}
+
+resp = requests.get(url=url,
+                    params=params
+                    )
+
+data = resp.json()
+sunrise = data["results"]["sunrise"]
+sunset = data["results"]["sunset"]
+sun_data = (sunrise, sunset)
+print(sun_data)
+```
