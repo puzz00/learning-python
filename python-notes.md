@@ -2461,7 +2461,7 @@ True
 
 ## Working with HTTP
 
-We can *install* the *requests* library using `a`
+We can *install* the *requests* library using `pip install requests`
 
 The *requests* library lets us work with *http* using python.
 
